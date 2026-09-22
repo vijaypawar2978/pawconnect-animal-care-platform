@@ -102,8 +102,8 @@ router.get("/animals", async (req, res): Promise<void> => {
   }
   const { species, status, search } = parsed.data;
   const filters = [
-    species ? eq(animalsTable.species, species) : undefined,
-    status ? eq(animalsTable.status, status) : undefined,
+    species ? ilike(animalsTable.species, species) : undefined,
+    status ? ilike(animalsTable.status, status) : undefined,
     search
       ? or(
           ilike(animalsTable.name, `%${search}%`),
