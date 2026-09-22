@@ -1,6 +1,6 @@
-# [Project name]
+# PawConnect
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+PawConnect is an animal welfare command center for rescue, adoption, veterinary care, lost-and-found reports, and shared animal records.
 
 ## Run & Operate
 
@@ -22,23 +22,38 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/pawconnect/src/App.tsx` — responsive web app shell and product routes
+- `artifacts/pawconnect/src/index.css` — PawConnect visual theme and motion
+- `artifacts/api-server/src/routes/pawconnect.ts` — dashboard, animal, SOS, report, vet, appointment, and assistant routes
+- `lib/api-spec/openapi.yaml` — API source of truth
+- `lib/db/src/schema/` — Drizzle tables for animals, emergencies, reports, vets, and appointments
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- The frontend uses generated React Query hooks from the OpenAPI contract instead of hand-written request types.
+- Animal statuses and species are matched case-insensitively at the API boundary so forms and seeded records remain interoperable.
+- The care assistant intentionally provides triage guidance and escalation steps, not a medical diagnosis.
+- Seed data is included for the development database so the first dashboard view demonstrates the complete MVP flow.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+- Care pulse dashboard with live emergency, adoption, vet, and lost-and-found counts
+- Emergency SOS intake and response board
+- Adoption discovery with search and species filters
+- Lost-and-found report creation and filtering
+- Nearby veterinary directory and appointment booking
+- Basic animal-care assistant with safety disclaimers and emergency escalation
+- Digital animal profiles with vaccination status and edit flow
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+ - Keep the product focused on animal rescue, care coordination, adoption, and community outcomes.
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- Run API codegen after editing `lib/api-spec/openapi.yaml`.
+- The app workflow supplies `PORT` and `BASE_PATH`; do not hardcode either in frontend code.
+- Seeded image URLs are remote demo assets; replace them with managed storage before production use.
 
 ## Pointers
 
