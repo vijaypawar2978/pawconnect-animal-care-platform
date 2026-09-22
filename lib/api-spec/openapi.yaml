@@ -1,0 +1,406 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: dashboard
+    description: Dashboard summaries and activity
+  - name: animals
+    description: Animal profiles and adoption listings
+  - name: emergencies
+    description: Emergency rescue requests
+  - name: reports
+    description: Lost and found reports
+  - name: vets
+    description: Veterinary care and appointments
+  - name: assistant
+    description: Animal care guidance
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /dashboard:
+    get:
+      operationId: getDashboard
+      tags: [dashboard]
+      summary: Get dashboard overview
+      responses:
+        "200":
+          description: Dashboard overview
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dashboard"
+  /animals:
+    get:
+      operationId: listAnimals
+      tags: [animals]
+      summary: List animals
+      parameters:
+        - in: query
+          name: species
+          schema:
+            type: string
+        - in: query
+          name: status
+          schema:
+            type: string
+        - in: query
+          name: search
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Animal listings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Animal"
+    post:
+      operationId: createAnimal
+      tags: [animals]
+      summary: Create an animal profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnimalInput"
+      responses:
+        "201":
+          description: Animal created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Animal"
+  /animals/{id}:
+    get:
+      operationId: getAnimal
+      tags: [animals]
+      summary: Get an animal profile
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          description: Animal profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Animal"
+        "404":
+          description: Animal not found
+    patch:
+      operationId: updateAnimal
+      tags: [animals]
+      summary: Update an animal profile
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnimalUpdate"
+      responses:
+        "200":
+          description: Updated animal
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Animal"
+  /emergencies:
+    get:
+      operationId: listEmergencies
+      tags: [emergencies]
+      summary: List recent emergency requests
+      responses:
+        "200":
+          description: Emergency requests
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Emergency"
+    post:
+      operationId: createEmergency
+      tags: [emergencies]
+      summary: Create an emergency SOS request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmergencyInput"
+      responses:
+        "201":
+          description: Emergency created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Emergency"
+  /reports:
+    get:
+      operationId: listReports
+      tags: [reports]
+      summary: List lost and found reports
+      parameters:
+        - in: query
+          name: type
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Reports
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Report"
+    post:
+      operationId: createReport
+      tags: [reports]
+      summary: Create a lost or found report
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReportInput"
+      responses:
+        "201":
+          description: Report created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Report"
+  /vets:
+    get:
+      operationId: listVets
+      tags: [vets]
+      summary: List nearby veterinarians
+      responses:
+        "200":
+          description: Veterinarians
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Vet"
+  /appointments:
+    post:
+      operationId: createAppointment
+      tags: [vets]
+      summary: Book a vet appointment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AppointmentInput"
+      responses:
+        "201":
+          description: Appointment booked
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Appointment"
+  /assistant:
+    post:
+      operationId: askAssistant
+      tags: [assistant]
+      summary: Get basic animal care guidance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssistantInput"
+      responses:
+        "200":
+          description: Care guidance
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssistantResponse"
+components:
+  parameters:
+    Id:
+      in: path
+      name: id
+      required: true
+      schema:
+        type: integer
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+    Animal:
+      type: object
+      required: [id, name, species, breed, age, location, status, imageUrl, description, vaccinated]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        species: { type: string }
+        breed: { type: string }
+        age: { type: string }
+        location: { type: string }
+        status: { type: string }
+        imageUrl: { type: string }
+        description: { type: string }
+        vaccinated: { type: boolean }
+        createdAt: { type: string }
+    AnimalInput:
+      type: object
+      required: [name, species, breed, age, location, status, imageUrl, description, vaccinated]
+      properties:
+        name: { type: string, minLength: 1 }
+        species: { type: string }
+        breed: { type: string }
+        age: { type: string }
+        location: { type: string }
+        status: { type: string }
+        imageUrl: { type: string }
+        description: { type: string }
+        vaccinated: { type: boolean }
+    AnimalUpdate:
+      type: object
+      properties:
+        name: { type: string }
+        status: { type: string }
+        description: { type: string }
+        vaccinated: { type: boolean }
+    Emergency:
+      type: object
+      required: [id, title, description, location, status, urgency, createdAt]
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        description: { type: string }
+        location: { type: string }
+        status: { type: string }
+        urgency: { type: string }
+        createdAt: { type: string }
+    EmergencyInput:
+      type: object
+      required: [title, description, location, urgency]
+      properties:
+        title: { type: string, minLength: 1 }
+        description: { type: string, minLength: 1 }
+        location: { type: string, minLength: 1 }
+        urgency: { type: string }
+    Report:
+      type: object
+      required: [id, type, name, location, date, description, status, imageUrl]
+      properties:
+        id: { type: integer }
+        type: { type: string }
+        name: { type: string }
+        location: { type: string }
+        date: { type: string }
+        description: { type: string }
+        status: { type: string }
+        imageUrl: { type: string }
+    ReportInput:
+      type: object
+      required: [type, name, location, date, description, imageUrl]
+      properties:
+        type: { type: string }
+        name: { type: string }
+        location: { type: string }
+        date: { type: string }
+        description: { type: string }
+        imageUrl: { type: string }
+    Vet:
+      type: object
+      required: [id, name, clinic, distance, rating, specialty, availableToday]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        clinic: { type: string }
+        distance: { type: string }
+        rating: { type: number }
+        specialty: { type: string }
+        availableToday: { type: boolean }
+    Appointment:
+      type: object
+      required: [id, vetId, animalName, date, time, reason, status]
+      properties:
+        id: { type: integer }
+        vetId: { type: integer }
+        animalName: { type: string }
+        date: { type: string }
+        time: { type: string }
+        reason: { type: string }
+        status: { type: string }
+    AppointmentInput:
+      type: object
+      required: [vetId, animalName, date, time, reason]
+      properties:
+        vetId: { type: integer }
+        animalName: { type: string }
+        date: { type: string }
+        time: { type: string }
+        reason: { type: string }
+    Dashboard:
+      type: object
+      required: [activeEmergencies, animalsForAdoption, nearbyVets, openReports, recentActivity]
+      properties:
+        activeEmergencies: { type: integer }
+        animalsForAdoption: { type: integer }
+        nearbyVets: { type: integer }
+        openReports: { type: integer }
+        recentActivity:
+          type: array
+          items:
+            $ref: "#/components/schemas/Activity"
+    Activity:
+      type: object
+      required: [id, title, detail, time, kind]
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        detail: { type: string }
+        time: { type: string }
+        kind: { type: string }
+    AssistantInput:
+      type: object
+      required: [message]
+      properties:
+        message: { type: string, minLength: 1 }
+    AssistantResponse:
+      type: object
+      required: [urgency, guidance, nextSteps, disclaimer]
+      properties:
+        urgency: { type: string }
+        guidance: { type: string }
+        nextSteps:
+          type: array
+          items: { type: string }
+        disclaimer: { type: string }
+
